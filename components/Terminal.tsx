@@ -165,7 +165,7 @@ const Terminal = () => {
   useEffect(() => {
     const audio = new Audio("/UNDERTALE - Spider Dance.mp3")
     audio.loop = true
-    audio.volume = 0.3
+    audio.volume = 0.25
     audioRef.current = audio
 
     // Try to play and handle autoplay restrictions
@@ -175,6 +175,15 @@ const Terminal = () => {
         console.log("Autoplay prevented:", error)
       })
     }
+
+    // Add a click handler to the document to start audio if autoplay was blocked
+    const handleFirstInteraction = () => {
+      if (audioRef.current) {
+        audioRef.current.play().catch((err) => console.log("Still unable to play audio:", err))
+        document.removeEventListener("click", handleFirstInteraction)
+      }
+    }
+    document.addEventListener("click", handleFirstInteraction)
 
     // Cleanup
     return () => {
