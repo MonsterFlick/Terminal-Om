@@ -61,4 +61,3 @@ export async function getRandomCatFact(): Promise<string> {
 
   return catFacts[Math.floor(Math.random() * catFacts.length)]
 }
-

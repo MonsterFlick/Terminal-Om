@@ -30,6 +30,14 @@ import {
   Code,
   Cloud,
   Sparkles,
+  User,
+  Briefcase,
+  GraduationCap,
+  Mail,
+  Phone,
+  Linkedin,
+  Globe,
+  FileText,
 } from "lucide-react"
 import { getRandomJoke, getRandomCatFact } from "@/lib/api"
 import { cn } from "@/lib/utils"
@@ -61,6 +69,7 @@ const Terminal = () => {
   const [cursorBlink, setCursorBlink] = useState(true)
   const [showWelcome, setShowWelcome] = useState(true)
   const [terminalMinimized, setTerminalMinimized] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Welcome message with ASCII art
   const welcomeMessage = [
@@ -75,7 +84,7 @@ const Terminal = () => {
     "│                                                                         │",
     "└─────────────────────────────────────────────────────────────────────────┘",
     "",
-    "Welcome to Terminal Pro. Type 'help' to see available commands.",
+    "Welcome to Om Thakur's Terminal. Type 'help' to see available commands.",
     "Version 2.0.0 - Professional Edition",
   ].join("\n")
 
@@ -152,23 +161,34 @@ const Terminal = () => {
     return () => document.removeEventListener("keydown", handleEsc)
   }, [isFullscreen])
 
-  // Play sound effect
-  const playSound = useCallback(
-    (soundType: "command" | "error" | "success") => {
-      if (isMuted) return
+  // Initialize background music
+  useEffect(() => {
+    const audio = new Audio("/UNDERTALE - Spider Dance.mp3")
+    audio.loop = true
+    audio.volume = 0.3
+    audioRef.current = audio
 
-      const sounds = {
-        command: new Audio("/sounds/key-press.mp3"),
-        error: new Audio("/sounds/error.mp3"),
-        success: new Audio("/sounds/success.mp3"),
-      }
+    // Try to play and handle autoplay restrictions
+    const playPromise = audio.play()
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.log("Autoplay prevented:", error)
+      })
+    }
 
-      const sound = sounds[soundType]
-      sound.volume = 0.2
-      sound.play().catch((e) => console.error("Failed to play sound", e))
-    },
-    [isMuted],
-  )
+    // Cleanup
+    return () => {
+      audio.pause()
+      audio.src = ""
+    }
+  }, [])
+
+  // Update mute state for background music
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted
+    }
+  }, [isMuted])
 
   // Add command to history
   const addToHistory = useCallback((output: CommandOutput) => {
@@ -207,8 +227,6 @@ const Terminal = () => {
         timestamp: new Date(),
       })
 
-      playSound("command")
-
       // Update command history for up/down navigation
       if (command) {
         setCommandHistory((prev) => {
@@ -245,29 +263,181 @@ const Terminal = () => {
               <div className="space-y-3 p-3 bg-slate-800/50 rounded-md border border-slate-700">
                 <h3 className="text-slate-100 font-semibold text-lg flex items-center gap-2">
                   <Info size={16} className="text-cyan-400" />
-                  About Terminal Pro
+                  About Om Thakur
                 </h3>
                 <p className="text-slate-300">
-                  Terminal Pro is a sophisticated, browser-based terminal interface designed for professionals. Built
-                  with modern web technologies, it provides a seamless and intuitive command-line experience.
+                  Research-minded developer with a solid foundation in backend systems and AI/ML. Skilled in
+                  experimentation, scalable system design, and collaborative problem-solving. Currently deepening
+                  expertise in machine learning and passionate about impactful, real-world innovation through research.
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-sm mt-2">
                   <div>
-                    <p className="text-slate-400 font-medium">Version</p>
-                    <p className="text-slate-300">2.0.0 Professional</p>
+                    <p className="text-slate-400 font-medium">Location</p>
+                    <p className="text-slate-300">Mumbai, Maharashtra, India</p>
                   </div>
                   <div>
-                    <p className="text-slate-400 font-medium">Framework</p>
-                    <p className="text-slate-300">Next.js + React</p>
+                    <p className="text-slate-400 font-medium">Email</p>
+                    <p className="text-slate-300">omthakur2366@gmail.com</p>
                   </div>
                   <div>
-                    <p className="text-slate-400 font-medium">UI Library</p>
-                    <p className="text-slate-300">Framer Motion</p>
+                    <p className="text-slate-400 font-medium">Phone</p>
+                    <p className="text-slate-300">7756898550</p>
                   </div>
                   <div>
-                    <p className="text-slate-400 font-medium">Deployment</p>
-                    <p className="text-slate-300">Vercel</p>
+                    <p className="text-slate-400 font-medium">Website</p>
+                    <p className="text-slate-300">om-thakur.vercel.app</p>
                   </div>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <a
+                    href="https://www.linkedin.com/in/omthakur2366"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm flex items-center gap-1 hover:bg-blue-700 transition-colors"
+                  >
+                    <Linkedin size={14} />
+                    LinkedIn
+                  </a>
+                  <a
+                    href="https://om-thakur.vercel.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-slate-600 text-white rounded-md text-sm flex items-center gap-1 hover:bg-slate-700 transition-colors"
+                  >
+                    <Globe size={14} />
+                    Website
+                  </a>
+                </div>
+              </div>
+            ),
+            timestamp: new Date(),
+          })
+          break
+
+        case "resume":
+        case "cv":
+          addToHistory({
+            id: Date.now(),
+            type: "response",
+            content: (
+              <div className="space-y-4 p-4 bg-slate-800/50 rounded-md border border-slate-700">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-100">Om Thakur</h2>
+                    <p className="text-slate-300">Research-minded Developer</p>
+                  </div>
+                  <div className="text-right text-sm text-slate-400">
+                    <p>Mumbai, Maharashtra, India</p>
+                    <p>omthakur2366@gmail.com</p>
+                    <p>7756898550</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
+                    <Briefcase size={16} />
+                    Experience
+                  </h3>
+                  <div className="ml-1 space-y-3">
+                    <div>
+                      <div className="flex justify-between">
+                        <p className="font-medium text-slate-200">SDE (Internship)</p>
+                        <p className="text-sm text-slate-400">August 2024 - February 2025</p>
+                      </div>
+                      <p className="text-sm text-slate-300">
+                        Art of Living Digital (Sumeru technology solutions) | Bengaluru
+                      </p>
+                      <ul className="list-disc list-inside text-sm text-slate-400 mt-1 space-y-1">
+                        <li>Conducted in-depth research on Drizzle ORM and Supabase Row-Level Security (RLS)</li>
+                        <li>
+                          Implemented message queue systems, reducing data synchronization time from 15 minutes to under
+                          4 seconds
+                        </li>
+                        <li>Investigated architectural patterns for scalable notification systems</li>
+                        <li>Led research and Root Cause Analysis (RCA) on Supabase database crashes</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
+                    <Code size={16} />
+                    Projects
+                  </h3>
+                  <div className="ml-1 space-y-3">
+                    <div>
+                      <p className="font-medium text-slate-200">NeuraTalk – AI Chatbot with LLaMA2 on Streamlit</p>
+                      <p className="text-sm text-slate-400">Mumbai University | monsterchat.streamlit.app/</p>
+                      <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
+                        <li>Built an AI chatbot interface using Streamlit with LLaMA2 models</li>
+                        <li>Enabled model selection and parameter fine-tuning</li>
+                        <li>Engineered a debounce mechanism to optimize GPU usage</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <p className="font-medium text-slate-200">Terminal-based Website</p>
+                      <p className="text-sm text-slate-400">Hobby | om-thakur.vercel.app/</p>
+                      <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
+                        <li>Designed and developed a terminal-style website that mimics command-line interfaces</li>
+                        <li>Integrated AI-powered responses using Google Gemini API</li>
+                        <li>Utilized Tailwind CSS to build responsive UI components</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
+                    <GraduationCap size={16} />
+                    Education
+                  </h3>
+                  <div className="ml-1">
+                    <div className="flex justify-between">
+                      <p className="font-medium text-slate-200">Bachelor of Science - BS, Information Technology</p>
+                      <p className="text-sm text-slate-400">April 2024</p>
+                    </div>
+                    <p className="text-sm text-slate-300">Sonubhau Baswant College | Mumbai, IN</p>
+                    <p className="text-sm text-slate-400">GPA: 8.55</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
+                    <Star size={16} />
+                    Skills
+                  </h3>
+                  <div className="ml-1">
+                    <p className="text-sm text-slate-300">
+                      <span className="font-medium">Backend & API Development:</span> Deno, Supabase, PostgreSQL,
+                      RESTful APIs
+                    </p>
+                    <p className="text-sm text-slate-300">
+                      <span className="font-medium">Research & Experimentation:</span> System bottlenecks, RCA, scalable
+                      architecture
+                    </p>
+                    <p className="text-sm text-slate-300">
+                      <span className="font-medium">Generative AI & LLMs:</span> LLaMA2, Gemini, prompt engineering
+                    </p>
+                    <p className="text-sm text-slate-300">
+                      <span className="font-medium">Web Technologies:</span> React, TypeScript, Tailwind CSS
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <a
+                    href="#"
+                    className="px-3 py-1.5 bg-cyan-600 text-white rounded-md text-sm flex items-center gap-1 hover:bg-cyan-700 transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      window.open("https://om-thakur.vercel.app", "_blank")
+                    }}
+                  >
+                    <FileText size={14} />
+                    View Full Resume
+                  </a>
                 </div>
               </div>
             ),
@@ -294,7 +464,6 @@ const Terminal = () => {
               ),
               timestamp: new Date(),
             })
-            playSound("success")
           } catch (error) {
             removeLoadingIndicator(loadingId)
             addToHistory({
@@ -303,7 +472,6 @@ const Terminal = () => {
               content: "Error: Failed to fetch joke data. Please try again later.",
               timestamp: new Date(),
             })
-            playSound("error")
           }
           break
 
@@ -327,7 +495,6 @@ const Terminal = () => {
               ),
               timestamp: new Date(),
             })
-            playSound("success")
           } catch (error) {
             removeLoadingIndicator(catLoadingId)
             addToHistory({
@@ -336,7 +503,6 @@ const Terminal = () => {
               content: "Error: Failed to fetch cat fact data. Please try again later.",
               timestamp: new Date(),
             })
-            playSound("error")
           }
           break
 
@@ -377,7 +543,6 @@ const Terminal = () => {
             ),
             timestamp: new Date(),
           })
-          playSound("success")
           break
 
         case "theme":
@@ -395,7 +560,197 @@ const Terminal = () => {
           addToHistory({
             id: Date.now(),
             type: "system",
-            content: `Sound effects ${isMuted ? "unmuted" : "muted"}.`,
+            content: `Background music ${isMuted ? "unmuted" : "muted"}.`,
+            timestamp: new Date(),
+          })
+          break
+
+        case "contact":
+          addToHistory({
+            id: Date.now(),
+            type: "response",
+            content: (
+              <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700">
+                <h3 className="text-slate-100 font-semibold text-lg mb-3 flex items-center gap-2">
+                  <User size={16} className="text-cyan-400" />
+                  Contact Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-md">
+                    <div className="bg-cyan-500/20 p-2 rounded-full">
+                      <Mail size={20} className="text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs">Email</p>
+                      <a
+                        href="mailto:omthakur2366@gmail.com"
+                        className="text-slate-200 hover:text-cyan-400 transition-colors"
+                      >
+                        omthakur2366@gmail.com
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-md">
+                    <div className="bg-purple-500/20 p-2 rounded-full">
+                      <Phone size={20} className="text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs">Phone</p>
+                      <a href="tel:7756898550" className="text-slate-200 hover:text-purple-400 transition-colors">
+                        7756898550
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-md">
+                    <div className="bg-blue-500/20 p-2 rounded-full">
+                      <Linkedin size={20} className="text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs">LinkedIn</p>
+                      <a
+                        href="https://www.linkedin.com/in/omthakur2366"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-slate-200 hover:text-blue-400 transition-colors"
+                      >
+                        in/omthakur2366
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-md">
+                    <div className="bg-emerald-500/20 p-2 rounded-full">
+                      <Globe size={20} className="text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-xs">Website</p>
+                      <a
+                        href="https://om-thakur.vercel.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-slate-200 hover:text-emerald-400 transition-colors"
+                      >
+                        om-thakur.vercel.app
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            timestamp: new Date(),
+          })
+          break
+
+        case "projects":
+          addToHistory({
+            id: Date.now(),
+            type: "response",
+            content: (
+              <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700">
+                <h3 className="text-slate-100 font-semibold text-lg mb-3 flex items-center gap-2">
+                  <Code size={16} className="text-cyan-400" />
+                  Projects
+                </h3>
+
+                <div className="space-y-4">
+                  <div className="p-3 bg-slate-700/30 rounded-md">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-slate-100 font-medium">NeuraTalk – AI Chatbot with LLaMA2</h4>
+                      <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">
+                        Mumbai University
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-sm mt-1">
+                      Built an AI chatbot interface using Streamlit, enabling real-time conversations with LLaMA2 models
+                      hosted via Replicate.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <a
+                        href="https://monsterchat.streamlit.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                      >
+                        <Globe size={12} />
+                        Live Demo
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-slate-700/30 rounded-md">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-slate-100 font-medium">Terminal-based Website</h4>
+                      <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">Hobby</span>
+                    </div>
+                    <p className="text-slate-300 text-sm mt-1">
+                      Designed and developed a terminal-style website that mimics command-line interfaces to deliver an
+                      engaging, interactive user experience.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <a
+                        href="https://om-thakur.vercel.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                      >
+                        <Globe size={12} />
+                        Live Demo
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-slate-700/30 rounded-md">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-slate-100 font-medium">Salary-Prediction</h4>
+                      <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">
+                        Mumbai University
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-sm mt-1">
+                      Developed a regression model in Python that predicted employee salaries with over 85% accuracy.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <a
+                        href="https://github.com/MonsterFlick/Salary-Prediction"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                      >
+                        <Github size={12} />
+                        GitHub
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-slate-700/30 rounded-md">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-slate-100 font-medium">IPL Data Analysis – Auction Strategy</h4>
+                      <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">
+                        Mumbai University
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-sm mt-1">
+                      Analyzed 15+ years of IPL match data using SQL to support data-driven auction strategies for a new
+                      franchise.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <a
+                        href="https://github.com/MonsterFlick/IPL-AUCTION"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                      >
+                        <Github size={12} />
+                        GitHub
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
             timestamp: new Date(),
           })
           break
@@ -448,7 +803,7 @@ const Terminal = () => {
           break
 
         case "github":
-          window.open("https://github.com/yourusername/terminal-pro", "_blank")
+          window.open("https://github.com/MonsterFlick", "_blank")
           addToHistory({
             id: Date.now(),
             type: "system",
@@ -476,7 +831,6 @@ const Terminal = () => {
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
             })
-            playSound("error")
             break
           }
 
@@ -505,7 +859,6 @@ const Terminal = () => {
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
             })
-            playSound("error")
             break
           }
 
@@ -552,7 +905,6 @@ const Terminal = () => {
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
             })
-            playSound("error")
             break
           }
 
@@ -577,7 +929,6 @@ const Terminal = () => {
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
             })
-            playSound("error")
             break
           }
 
@@ -627,7 +978,6 @@ const Terminal = () => {
             content: `Error: Command not found: ${command}. Type 'help' to see available commands.`,
             timestamp: new Date(),
           })
-          playSound("error")
           break
       }
     },
@@ -637,7 +987,6 @@ const Terminal = () => {
       isMuted,
       isSuperMode,
       isFullscreen,
-      playSound,
       removeLoadingIndicator,
       showResourceMonitor,
       theme,
@@ -650,7 +999,10 @@ const Terminal = () => {
     const standardCommands = [
       { command: "help", description: "Display available commands", icon: <HelpCircle size={14} /> },
       { command: "clear", description: "Clear the terminal", icon: <Trash2 size={14} /> },
-      { command: "about", description: "About Terminal Pro", icon: <Info size={14} /> },
+      { command: "about", description: "About Om Thakur", icon: <Info size={14} /> },
+      { command: "resume", description: "View resume/CV", icon: <FileText size={14} /> },
+      { command: "contact", description: "Contact information", icon: <User size={14} /> },
+      { command: "projects", description: "View projects", icon: <Code size={14} /> },
       { command: "joke", description: "Display a random joke", icon: <Sparkles size={14} /> },
       { command: "catfacts", description: "Learn a random cat fact", icon: <Sparkles size={14} /> },
       { command: "resource_monitor", description: "Toggle system resource monitor", icon: <BarChart3 size={14} /> },
@@ -759,6 +1111,9 @@ const Terminal = () => {
         "help",
         "clear",
         "about",
+        "resume",
+        "contact",
+        "projects",
         "joke",
         "catfacts",
         "resource_monitor",
@@ -846,7 +1201,7 @@ const Terminal = () => {
             )}
           >
             <TerminalIcon size={14} className="text-cyan-500" />
-            <span>terminal-pro</span>
+            <span>om-thakur-terminal</span>
             {isSuperMode && (
               <span className="text-xs px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 font-medium">
                 Advanced
@@ -855,7 +1210,7 @@ const Terminal = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Tooltip content={isMuted ? "Unmute" : "Mute"}>
+          <Tooltip content={isMuted ? "Unmute Music" : "Mute Music"}>
             <button
               onClick={() => setIsMuted(!isMuted)}
               className={cn(
@@ -1059,4 +1414,3 @@ const Terminal = () => {
 }
 
 export default Terminal
-

@@ -158,4 +158,3 @@ const getColor = (index: number) => {
 }
 
 export default Navbar
-
