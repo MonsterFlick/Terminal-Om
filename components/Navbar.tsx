@@ -7,10 +7,9 @@ const Navbar = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   const links = [
-    { name: "Home", href: "https://omi.com", icon: "🏠" },
-    { name: "Projects", href: "https://omi.com", icon: "🚀" },
-    { name: "About", href: "https://omi.com", icon: "📘" },
-    { name: "Contact", href: "https://omi.com", icon: "📧" },
+    { name: "Home", href: "https://om-thakur.vercel.app/", icon: "🏠" },
+    { name: "Projects", href: "https://github.com/MonsterFlick", icon: "🚀" },
+    { name: "About", href: "https://omthakur.vercel.app/", icon: "📘" },
   ]
 
   return (

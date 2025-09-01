@@ -1,6 +1,8 @@
 "use client"
 
 import type React from "react"
+import { nanoid } from "nanoid";
+import { Sparkles } from "lucide-react"
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -29,7 +31,6 @@ import {
   Award,
   Code,
   Cloud,
-  Sparkles,
   User,
   Briefcase,
   GraduationCap,
@@ -41,13 +42,13 @@ import {
 } from "lucide-react"
 import { getRandomJoke, getRandomCatFact } from "@/lib/api"
 import { cn } from "@/lib/utils"
-import { Tooltip } from "./ui/Tooltip"
+import { Tooltip } from "./ui/tooltip"
 
 // Command history persistence
 const STORAGE_KEY = "terminal_history"
 
 type CommandOutput = {
-  id: number
+  id: string
   type: "command" | "response" | "error" | "system" | "ascii" | "resource" | "help" | "loading"
   content: string | React.ReactNode
   timestamp: Date
@@ -93,7 +94,7 @@ const Terminal = () => {
     if (showWelcome) {
       setHistory([
         {
-          id: Date.now(),
+          id: nanoid(),
           type: "ascii",
           content: welcomeMessage,
           timestamp: new Date(),
@@ -163,9 +164,10 @@ const Terminal = () => {
 
   // Initialize background music
   useEffect(() => {
-    const audio = new Audio("/UNDERTALE - Spider Dance.mp3")
+    const audio = new Audio("/bg.mp3")
     audio.loop = true
-    audio.volume = 0.25
+    const MAX_VOLUME = 0.050; // adjust this between 0.0 and 1.0
+  audio.volume = MAX_VOLUME;
     audioRef.current = audio
 
     // Try to play and handle autoplay restrictions
@@ -206,18 +208,18 @@ const Terminal = () => {
 
   // Add loading indicator
   const addLoadingIndicator = useCallback(() => {
-    const loadingId = Date.now()
+   const id = nanoid()
     addToHistory({
-      id: loadingId,
+      id,
       type: "loading",
       content: "Processing...",
       timestamp: new Date(),
     })
-    return loadingId
+    return id
   }, [addToHistory])
 
   // Remove loading indicator
-  const removeLoadingIndicator = useCallback((loadingId: number) => {
+  const removeLoadingIndicator = useCallback((loadingId: string|number) => {
     setHistory((prev) => prev.filter((item) => item.id !== loadingId))
   }, [])
 
@@ -230,7 +232,7 @@ const Terminal = () => {
 
       // Add command to history
       addToHistory({
-        id: Date.now(),
+        id: nanoid(),
         type: "command",
         content: `${isSuperMode ? "# " : "$ "}${cmd}`,
         timestamp: new Date(),
@@ -266,7 +268,7 @@ const Terminal = () => {
 
         case "about":
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "response",
             content: (
               <div className="space-y-3 p-3 bg-slate-800/50 rounded-md border border-slate-700">
@@ -275,9 +277,7 @@ const Terminal = () => {
                   About Om Thakur
                 </h3>
                 <p className="text-slate-300">
-                  Research-minded developer with a solid foundation in backend systems and AI/ML. Skilled in
-                  experimentation, scalable system design, and collaborative problem-solving. Currently deepening
-                  expertise in machine learning and passionate about impactful, real-world innovation through research.
+                 Backend Engineer passionate about building fast, scalable systems and real-time APIs. Improved system performance by replacing cron jobs with message queues. Skilled in TypeScript, Deno, and Supabase. Curious, hands-on, and driven by impact.
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-sm mt-2">
                   <div>
@@ -294,7 +294,7 @@ const Terminal = () => {
                   </div>
                   <div>
                     <p className="text-slate-400 font-medium">Website</p>
-                    <p className="text-slate-300">om-thakur.vercel.app</p>
+                    <p className="text-slate-300">omthakur.vercel.app</p>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-2">
@@ -308,7 +308,7 @@ const Terminal = () => {
                     LinkedIn
                   </a>
                   <a
-                    href="https://om-thakur.vercel.app"
+                    href="https://omthakur.vercel.app"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 bg-slate-600 text-white rounded-md text-sm flex items-center gap-1 hover:bg-slate-700 transition-colors"
@@ -323,136 +323,312 @@ const Terminal = () => {
           })
           break
 
-        case "resume":
-        case "cv":
-          addToHistory({
-            id: Date.now(),
-            type: "response",
-            content: (
-              <div className="space-y-4 p-4 bg-slate-800/50 rounded-md border border-slate-700">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-100">Om Thakur</h2>
-                    <p className="text-slate-300">Research-minded Developer</p>
-                  </div>
-                  <div className="text-right text-sm text-slate-400">
-                    <p>Mumbai, Maharashtra, India</p>
-                    <p>omthakur2366@gmail.com</p>
-                    <p>7756898550</p>
-                  </div>
-                </div>
 
-                <div>
-                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
-                    <Briefcase size={16} />
-                    Experience
-                  </h3>
-                  <div className="ml-1 space-y-3">
-                    <div>
-                      <div className="flex justify-between">
-                        <p className="font-medium text-slate-200">SDE (Internship)</p>
-                        <p className="text-sm text-slate-400">August 2024 - February 2025</p>
-                      </div>
-                      <p className="text-sm text-slate-300">
-                        Art of Living Digital (Sumeru technology solutions) | Bengaluru
-                      </p>
-                      <ul className="list-disc list-inside text-sm text-slate-400 mt-1 space-y-1">
-                        <li>Conducted in-depth research on Drizzle ORM and Supabase Row-Level Security (RLS)</li>
-                        <li>
-                          Implemented message queue systems, reducing data synchronization time from 15 minutes to under
-                          4 seconds
-                        </li>
-                        <li>Investigated architectural patterns for scalable notification systems</li>
-                        <li>Led research and Root Cause Analysis (RCA) on Supabase database crashes</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+case "resume":
+case "cv":
+  addToHistory({
+    id: nanoid(),
+    type: "response",
+    content: (
+      <div className="space-y-4 p-4 bg-slate-800/50 rounded-md border border-slate-700">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-xl font-bold text-slate-100">Om Thakur</h2>
+            <p className="text-slate-300">
+              Backend Engineer | Scalable Systems | Real-time APIs | AI
+            </p>
+          </div>
+          <div className="text-right text-sm text-slate-400">
+            <p>Mumbai, India</p>
+            <p>+91 7756898550</p>
+            <p>omthakur2366@gmail.com</p>
+            <a
+              href="https://omthakur.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:underline"
+            >
+              omthakur.vercel.app
+            </a>
+          </div>
+        </div>
 
-                <div>
-                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
-                    <Code size={16} />
-                    Projects
-                  </h3>
-                  <div className="ml-1 space-y-3">
-                    <div>
-                      <p className="font-medium text-slate-200">NeuraTalk – AI Chatbot with LLaMA2 on Streamlit</p>
-                      <p className="text-sm text-slate-400">Mumbai University | monsterchat.streamlit.app/</p>
-                      <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
-                        <li>Built an AI chatbot interface using Streamlit with LLaMA2 models</li>
-                        <li>Enabled model selection and parameter fine-tuning</li>
-                        <li>Engineered a debounce mechanism to optimize GPU usage</li>
-                      </ul>
-                    </div>
+        {/* Links */}
+        <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+          <a
+            href="https://github.com/MonsterFlick"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:underline"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://www.linkedin.com/in/omthakur2366/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:underline"
+          >
+            LinkedIn
+          </a>
+        </div>
 
-                    <div>
-                      <p className="font-medium text-slate-200">Terminal-based Website</p>
-                      <p className="text-sm text-slate-400">Hobby | om-thakur.vercel.app/</p>
-                      <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
-                        <li>Designed and developed a terminal-style website that mimics command-line interfaces</li>
-                        <li>Integrated AI-powered responses using Google Gemini API</li>
-                        <li>Utilized Tailwind CSS to build responsive UI components</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+        {/* Summary */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Summary
+          </h3>
+          <p className="text-sm text-slate-300">
+            Backend Engineer passionate about building fast, scalable systems
+            and real-time APIs. Improved system performance by replacing cron
+            jobs with message queues. Skilled in TypeScript, Deno, and Supabase.
+            Curious, hands-on, and driven by impact.
+          </p>
+        </div>
 
-                <div>
-                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
-                    <GraduationCap size={16} />
-                    Education
-                  </h3>
-                  <div className="ml-1">
-                    <div className="flex justify-between">
-                      <p className="font-medium text-slate-200">Bachelor of Science - BS, Information Technology</p>
-                      <p className="text-sm text-slate-400">April 2024</p>
-                    </div>
-                    <p className="text-sm text-slate-300">Sonubhau Baswant College | Mumbai, IN</p>
-                    <p className="text-sm text-slate-400">GPA: 8.55</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2 flex items-center gap-2">
-                    <Star size={16} />
-                    Skills
-                  </h3>
-                  <div className="ml-1">
-                    <p className="text-sm text-slate-300">
-                      <span className="font-medium">Backend & API Development:</span> Deno, Supabase, PostgreSQL,
-                      RESTful APIs
-                    </p>
-                    <p className="text-sm text-slate-300">
-                      <span className="font-medium">Research & Experimentation:</span> System bottlenecks, RCA, scalable
-                      architecture
-                    </p>
-                    <p className="text-sm text-slate-300">
-                      <span className="font-medium">Generative AI & LLMs:</span> LLaMA2, Gemini, prompt engineering
-                    </p>
-                    <p className="text-sm text-slate-300">
-                      <span className="font-medium">Web Technologies:</span> React, TypeScript, Tailwind CSS
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <a
-                    href="#"
-                    className="px-3 py-1.5 bg-cyan-600 text-white rounded-md text-sm flex items-center gap-1 hover:bg-cyan-700 transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      window.open("https://om-thakur.vercel.app", "_blank")
-                    }}
-                  >
-                    <FileText size={14} />
-                    View Full Resume
-                  </a>
-                </div>
+        {/* Experience */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Experience
+          </h3>
+          <div className="ml-1 space-y-3">
+            <div>
+              <div className="flex justify-between">
+                <p className="font-medium text-slate-200">SDE Intern</p>
+                <p className="text-sm text-slate-400">Aug 2024 – Feb 2025</p>
               </div>
-            ),
-            timestamp: new Date(),
-          })
-          break
+              <p className="text-sm text-slate-300">
+                Sumeru Technology Solutions Pvt. Ltd. | Bengaluru
+              </p>
+              <ul className="list-disc list-inside text-sm text-slate-400 mt-1 space-y-1">
+                <li>
+                  Replaced 15-minute cron jobs with Flexbase, reducing sync time
+                  to 4 seconds
+                </li>
+                <li>Migrated legacy PHP code to modern JavaScript & TypeScript</li>
+                <li>
+                  Developed backend APIs with Deno functions, tested via Postman
+                </li>
+                <li>
+                  Researched Drizzle ORM + Supabase Row-Level Security (RLS)
+                </li>
+                <li>
+                  Led 4-member team evaluating Novu vs custom notification
+                  systems; proposed dashboard applications
+                </li>
+                <li>
+                  RCA team: diagnosed Supabase crash (payment cron issue) and
+                  resolved Deno + TS type inference bug
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Education */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Education
+          </h3>
+          <div className="ml-1">
+            <div className="flex justify-between">
+              <p className="font-medium text-slate-200">
+                Bachelor of Science – Information Technology
+              </p>
+              <p className="text-sm text-slate-400">Aug 2021 – Apr 2024</p>
+            </div>
+            <p className="text-sm text-slate-300">
+              Sonubhau Baswant College, Mumbai University
+            </p>
+            <p className="text-sm text-slate-400">GPA: 8.55/10</p>
+            <p className="text-sm text-slate-400">
+              Graduated with top rank, led final-year project team as project
+              head.
+            </p>
+          </div>
+        </div>
+
+        {/* Projects */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Projects
+          </h3>
+          <div className="ml-1 space-y-3">
+            {/* BlogitUp */}
+            <div>
+              <p className="font-medium text-slate-200">
+                BlogitUp – AI Blog Insight + TTS Tool (2025)
+              </p>
+              <a
+                href="https://blogitup-fe.vercel.app/"
+                className="text-sm text-cyan-400 hover:underline"
+              >
+                blogitup-fe.vercel.app
+              </a>
+              <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
+                <li>
+                  Full-stack app: fetch blogs, generate Gemini-powered insights,
+                  play via TTS
+                </li>
+                <li>Bun backend APIs for text extraction + AI summarization</li>
+                <li>
+                  Integrated Gemini Flash 1.5 + advanced TTS controls (voice,
+                  pitch, rate)
+                </li>
+              </ul>
+            </div>
+
+            {/* Terminal Portfolio */}
+            <div>
+              <p className="font-medium text-slate-200">
+                Terminal Portfolio Website (2025)
+              </p>
+              <a
+                href="https://om-thakur.vercel.app/"
+                className="text-sm text-cyan-400 hover:underline"
+              >
+                om-thakur.vercel.app
+              </a>
+              <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
+                <li>
+                  Terminal-style interactive portfolio with Gemini AI responses
+                </li>
+                <li>AI-driven engagement + responsive design</li>
+              </ul>
+            </div>
+
+            {/* NeuraTalk */}
+            <div>
+              <p className="font-medium text-slate-200">
+                NeuraTalk – AI Chatbot (2023)
+              </p>
+              <a
+                href="https://monsterchat.streamlit.app/"
+                className="text-sm text-cyan-400 hover:underline"
+              >
+                monsterchat.streamlit.app
+              </a>
+              <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
+                <li>
+                  Chatbot supporting LLaMA2 (7B–70B), with streaming output
+                </li>
+                <li>
+                  Reduced latency by 40% using debounced throttling for GPU
+                  usage
+                </li>
+              </ul>
+            </div>
+
+            {/* GitHub–Supabase Sync */}
+            <div>
+              <p className="font-medium text-slate-200">
+                GitHub–Supabase Sync Tool (2025)
+              </p>
+              <a
+                href="https://github.com/MonsterFlick/github-supabase-sync"
+                className="text-sm text-cyan-400 hover:underline"
+              >
+                GitHub Repo
+              </a>
+              <ul className="list-disc list-inside text-sm text-slate-400 mt-1">
+                <li>
+                  Automated syncing of GitHub markdown blogs → Supabase with
+                  metadata parsing
+                </li>
+                <li>
+                  Edge cases handled: stale records cleanup & malformed
+                  frontmatter
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Volunteering */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Volunteering
+          </h3>
+          <div className="ml-1">
+            <div className="flex justify-between">
+              <p className="font-medium text-slate-200">Assistant Professor</p>
+              <p className="text-sm text-slate-400">Jun 2024 – Aug 2024</p>
+            </div>
+            <p className="text-sm text-slate-300">
+              Bhimrao Pradhan College, Mumbai University | Shahapur, Maharashtra
+            </p>
+            <p className="text-sm text-slate-400">
+              Taught B.Sc. IT subjects, mentored students & built structured
+              content.
+            </p>
+          </div>
+        </div>
+
+        {/* Skills */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Skills
+          </h3>
+          <p className="text-sm text-slate-300">
+            JavaScript • TypeScript • Node.js • Deno • Bun • Supabase •
+            PostgreSQL • APIs • Webhooks • Databases
+          </p>
+        </div>
+
+        {/* Certifications */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Certifications
+          </h3>
+          <p className="text-sm text-slate-300">
+            Data Science Training – Internshala (Oct 2023){" "}
+            <a
+              href="https://trainings.internshala.com/verify-certificate/?certificate_number=263gl7b3rur"
+              className="text-cyan-400 hover:underline"
+            >
+              Verify
+            </a>
+          </p>
+        </div>
+
+        {/* Awards */}
+        <div>
+          <h3 className="text-md font-semibold text-cyan-400 border-b border-slate-700 pb-1 mb-2">
+            Awards
+          </h3>
+          <p className="text-sm text-slate-300">
+            First Rank – B.Sc. IT (College Topper), Sonubhau Baswant College,
+            Mumbai University, Apr 2024
+          </p>
+        </div>
+
+        {/* View Full Resume Button */}
+        <div className="flex justify-end">
+          <a
+            href="https://omthakur.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 bg-cyan-600 text-white rounded-md text-sm flex items-center gap-1 hover:bg-cyan-700 transition-colors"
+          >
+            View Full Resume
+          </a>
+        </div>
+      </div>
+    ),
+    timestamp: new Date(),
+  })
+  break
+
+
+
+
+
+
+
+
+
+
 
         case "joke":
           const loadingId = addLoadingIndicator()
@@ -460,7 +636,7 @@ const Terminal = () => {
             const joke = await getRandomJoke()
             removeLoadingIndicator(loadingId)
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "response",
               content: (
                 <div className="p-3 bg-slate-800/50 rounded-md border border-slate-700">
@@ -476,7 +652,7 @@ const Terminal = () => {
           } catch (error) {
             removeLoadingIndicator(loadingId)
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "error",
               content: "Error: Failed to fetch joke data. Please try again later.",
               timestamp: new Date(),
@@ -491,7 +667,7 @@ const Terminal = () => {
             const fact = await getRandomCatFact()
             removeLoadingIndicator(catLoadingId)
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "response",
               content: (
                 <div className="p-3 bg-slate-800/50 rounded-md border border-slate-700">
@@ -507,7 +683,7 @@ const Terminal = () => {
           } catch (error) {
             removeLoadingIndicator(catLoadingId)
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "error",
               content: "Error: Failed to fetch cat fact data. Please try again later.",
               timestamp: new Date(),
@@ -520,7 +696,7 @@ const Terminal = () => {
         case "monitor":
           setShowResourceMonitor(!showResourceMonitor)
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: `System resource monitor ${showResourceMonitor ? "hidden" : "displayed"}.`,
             timestamp: new Date(),
@@ -530,7 +706,7 @@ const Terminal = () => {
         case "super":
           setIsSuperMode(!isSuperMode)
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: (
               <div className="p-3 bg-slate-800/50 rounded-md border border-slate-700">
@@ -557,7 +733,7 @@ const Terminal = () => {
         case "theme":
           toggleTheme()
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: `Theme switched to ${theme === "dark" ? "light" : "dark"} mode.`,
             timestamp: new Date(),
@@ -567,7 +743,7 @@ const Terminal = () => {
         case "mute":
           setIsMuted(!isMuted)
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: `Background music ${isMuted ? "unmuted" : "muted"}.`,
             timestamp: new Date(),
@@ -576,7 +752,7 @@ const Terminal = () => {
 
         case "contact":
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "response",
             content: (
               <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700">
@@ -637,12 +813,12 @@ const Terminal = () => {
                     <div>
                       <p className="text-slate-400 text-xs">Website</p>
                       <a
-                        href="https://om-thakur.vercel.app"
+                        href="https://omthakur.vercel.app"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-slate-200 hover:text-emerald-400 transition-colors"
                       >
-                        om-thakur.vercel.app
+                        omthakur.vercel.app
                       </a>
                     </div>
                   </div>
@@ -655,7 +831,7 @@ const Terminal = () => {
 
         case "projects":
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "response",
             content: (
               <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700">
@@ -700,7 +876,7 @@ const Terminal = () => {
                     </p>
                     <div className="mt-2 flex gap-2">
                       <a
-                        href="https://om-thakur.vercel.app/"
+                        href="https://omthakur.vercel.app/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs bg-slate-600 hover:bg-slate-500 text-white px-2 py-1 rounded flex items-center gap-1 transition-colors"
@@ -774,7 +950,7 @@ const Terminal = () => {
           const randomTemp = temperatures[Math.floor(Math.random() * temperatures.length)]
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "response",
             content: (
               <div className="p-3 bg-slate-800/50 rounded-md border border-slate-700">
@@ -814,7 +990,7 @@ const Terminal = () => {
         case "github":
           window.open("https://github.com/MonsterFlick", "_blank")
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: "Opening GitHub repository in a new tab...",
             timestamp: new Date(),
@@ -824,7 +1000,7 @@ const Terminal = () => {
         case "fullscreen":
           setIsFullscreen(!isFullscreen)
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: `Fullscreen mode ${isFullscreen ? "disabled" : "enabled"}.`,
             timestamp: new Date(),
@@ -835,7 +1011,7 @@ const Terminal = () => {
         case "matrix":
           if (!isSuperMode) {
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "error",
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
@@ -844,7 +1020,7 @@ const Terminal = () => {
           }
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "ascii",
             content: Array.from({ length: 15 }, () =>
               Array.from({ length: 50 }, () => (Math.random() > 0.5 ? "1" : "0")).join(" "),
@@ -853,7 +1029,7 @@ const Terminal = () => {
           })
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: "Matrix simulation initialized.",
             timestamp: new Date(),
@@ -863,7 +1039,7 @@ const Terminal = () => {
         case "coffee":
           if (!isSuperMode) {
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "error",
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
@@ -872,7 +1048,7 @@ const Terminal = () => {
           }
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "response",
             content: (
               <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700 flex items-center gap-4">
@@ -898,7 +1074,7 @@ const Terminal = () => {
 
           setTimeout(() => {
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "system",
               content: "Coffee break complete. Productivity increased by 42%.",
               timestamp: new Date(),
@@ -909,7 +1085,7 @@ const Terminal = () => {
         case "visualize":
           if (!isSuperMode) {
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "error",
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
@@ -923,7 +1099,7 @@ const Terminal = () => {
           }, 5000)
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: "Data visualization mode activated.",
             timestamp: new Date(),
@@ -933,7 +1109,7 @@ const Terminal = () => {
         case "award":
           if (!isSuperMode) {
             addToHistory({
-              id: Date.now(),
+              id: nanoid(),
               type: "error",
               content: "Error: This command requires advanced mode. Type 'super' to activate it.",
               timestamp: new Date(),
@@ -954,7 +1130,7 @@ const Terminal = () => {
           const randomAward = awards[Math.floor(Math.random() * awards.length)]
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "response",
             content: (
               <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700 text-center">
@@ -982,7 +1158,7 @@ const Terminal = () => {
           }
 
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "error",
             content: `Error: Command not found: ${command}. Type 'help' to see available commands.`,
             timestamp: new Date(),
@@ -1031,7 +1207,7 @@ const Terminal = () => {
     ]
 
     addToHistory({
-      id: Date.now(),
+      id: nanoid(),
       type: "help",
       content: (
         <div className="p-4 bg-slate-800/50 rounded-md border border-slate-700">
@@ -1144,7 +1320,7 @@ const Terminal = () => {
           setInput(matches[0])
         } else if (matches.length > 1) {
           addToHistory({
-            id: Date.now(),
+            id: nanoid(),
             type: "system",
             content: `Possible completions: ${matches.join(", ")}`,
             timestamp: new Date(),
